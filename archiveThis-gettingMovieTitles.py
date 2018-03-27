@@ -17,13 +17,11 @@ test_page = "https://www.rottentomatoes.com/critic/armond-white/movies"
 page = urllib2.urlopen(test_page)
 #parse to BS4 format
 soup = BeautifulSoup(page, 'html.parser')
-corpus = soup.select('#criticsReviewsChart_main')
-print corpus
+selection = soup.select("a.movie-link")
 
-# for row in soup.findAll('table')[0].tbody.findAll('tr'):
-#     first_column = row.findAll('th')[0].contents
-#     third_column = row.findAll('td')[2].contents
-#     print first_column, third_column
+for i in selection:
+    print i.string
+
 
 # print selection[1].string
 # print len(selection)
