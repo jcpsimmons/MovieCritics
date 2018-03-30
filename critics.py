@@ -2,17 +2,14 @@ import urllib2
 from bs4 import BeautifulSoup
 import csv
 
-# testarray = []
-#
-# with open('CriticsList.csv', 'r') as csvfile:
-#     csvReader = csv.reader(csvfile)
-#     for row in csvReader:
-#         testarray.append(row)
-# testarray = testarray[0]
+name_list = []
 
+with open('CriticsList.csv', 'r') as csvfile:
+    csvReader = csv.reader(csvfile)
+    for row in csvReader:
+        name_list.append(row)
+name_list = name_list[0]
 
-# to be replaced with scraping from the critics list?
-name_list = ["armond-white", "anthony-lane", "peter-rainer", "j-r-jones", "james-adams"]
 critics = {}
 ## initialize critics key value pair with score
 for name in name_list:
@@ -38,6 +35,7 @@ def decrease_autonomy(critic_name):
 
 def calculate_score(critic):
     scan_offset = 0
+    backend_marker = 0
     test_page = "https://www.rottentomatoes.com/critic/" + critic + "/movies"
     #gets the html
     page = urllib2.urlopen(test_page)
@@ -57,27 +55,41 @@ def calculate_score(critic):
         # hunt for the first movie link
         for count, value in enumerate(corpus_input):
             if str(value).find("movie-link") != -1:
-                scan_offset = count - 1
+                return count - 1
                 break
 
-    offset_finder(corpus)
+    scan_offset = offset_finder(corpus)
+
+    if scan_offset is None:
+        print "No reviews found."
+        critics[critic] = -1.
+        return
 
 
 
     print("scan offset is " + str(scan_offset))
 
+    def backend_finder(corpus_input):
+        for value in reversed(corpus_input):
+            if str(value).find("movie-link") != -1:
+                return corpus_input.index(value)
+                break
 
-    for i in range(0,(len(corpus) - 196)):
-        del(corpus[196])
+    backend_marker = backend_finder(corpus)
+
+
+    # for i in range(0,(len(corpus) - 196)):
+    #     del(corpus[196])
 
 
     # 1,2,5,6,9,10
     # two pair streams each counting by four, generate one, clone it and add 1 to all values, then interleave (zip) the two lists
-    reviewer_rating_indices = range(1, len(corpus), 4)
-    rottentomatoes_rating_indices = range(2, len(corpus), 4)
+    reviewer_rating_indices = range(scan_offset - 1, backend_marker, 4)
+    rottentomatoes_rating_indices = range(scan_offset, backend_marker, 4)
 
     critic_reviews = []
     rottentomatoes_reviews = []
+
 
     for i in reviewer_rating_indices:
         critic_reviews.append(corpus[i])
@@ -102,6 +114,12 @@ def calculate_score(critic):
         else:
             increase_autonomy(critic)
 
-    print critics
 
-calculate_score("armond-white")
+
+
+# calculate_score("christian-bone")
+# print critics["christian-bone"]
+
+for key in critics:
+    calculate_score(key)
+    print key + str(critics[key])
