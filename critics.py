@@ -3,6 +3,10 @@ from bs4 import BeautifulSoup
 import csv
 import sys
 import os
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
+
+pool = ThreadPool(8)
 
 name_list = []
 
@@ -48,6 +52,11 @@ def calculate_score(critic):
         corpus = soup.select('td')
         # lop off array outside of 53 - 249
         ### THIS NEEDS to be tidied up and some how made relative so that different pages can be taken into account
+
+        def find_review_number(corpus_input):
+            for count, value in enumerate(corpus_input):
+                if str(value).find("Showing 1 - "):
+                    return value
 
         # strip the code from the site topnav bar
         for i in range(0,50):
@@ -113,21 +122,29 @@ def calculate_score(critic):
             else:
                 increase_autonomy(critic)
 
+        print str(critic) + str(critics[critic])
 
-    except:
+    except IncompleteRead:
+        calculate_score(critics[critic])
+
+    except IndexError:
         # handles errors
         print "No reviews found."
+        print critics[critic]
         critics[critic] = -1.
         return
 
+#
+# calculate_score("armond-white")
 
-# calculate_score("christian-bone")
-# print critics["christian-bone"]
+# for count, key in enumerate(critics):
+#     calculate_score(key)
+#     print key + " " + str(critics[key])
+#     print str(len(critics) - count) + " " + "remaining."
 
-for count, key in enumerate(critics):
-    calculate_score(key)
-    print key + " " + str(critics[key])
-    print str(len(critics) - count) + " " + "remaining."
+# run in parallel
+results = pool.map(calculate_score, critics)
+
 
 for key, value in sorted(critics.iteritems(), key=lambda (k,v): (v,k)):
     print "%s: %s" % (key, value)
