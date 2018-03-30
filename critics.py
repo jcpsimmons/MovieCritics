@@ -37,6 +37,7 @@ soup = BeautifulSoup(page, 'html.parser')
 # Reviews start at line 53 end with 249
 corpus = soup.select('td')
 # lop off array outside of 53 - 249
+### THIS NEEDS to be tidied up and some how made relative so that different pages can be taken into account
 for i in range(0,53):
     del(corpus[0])
 for i in range(0,(len(corpus) - 196)):
