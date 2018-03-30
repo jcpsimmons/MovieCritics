@@ -2,6 +2,7 @@ import urllib2
 from bs4 import BeautifulSoup
 import csv
 import sys
+import os
 
 name_list = []
 
@@ -112,11 +113,8 @@ def calculate_score(critic):
             else:
                 increase_autonomy(critic)
 
-    except KeyboardInterrupt:
-        # quit with ctrl c
-        sys.exit(0)
 
-    else:
+    except:
         # handles errors
         print "No reviews found."
         critics[critic] = -1.
@@ -133,5 +131,11 @@ for count, key in enumerate(critics):
 
 for key, value in sorted(critics.iteritems(), key=lambda (k,v): (v,k)):
     print "%s: %s" % (key, value)
-#
-# print critics
+
+dirname = os.path.dirname(os.path.abspath(__file__))
+csvfilename = os.path.join(dirname, 'CriticScores.csv')
+
+with open (csvfilename, 'wb') as csv_file:
+    writer = csv.writer(csv_file)
+    for key, value in sorted(critics.iteritems(), key=lambda (k,v): (v,k)):
+        writer.writerow([key, value])
