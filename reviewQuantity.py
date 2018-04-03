@@ -16,16 +16,15 @@ def findFirst(search_string, corpus):
         if str(value).find(search_string) != -1:
             #now get just the full number out of this
             value = str(value)
+            # reverse list
             value = value[::-1]
             for iter, char in enumerate(value):
                 if bool(re.search(r'\d', char)) and end_clip == 0:
-                    end = iter
+                    end_clip = iter
+                    end_clip = len(value) - end_clip
             value = value[::-1]
-            for iter, char in enumerate(value):
-                if char == 'f' and begin_clip == 0:
-                    begin_clip = iter + 1
-            print begin_clip
-            print end_clip
+            begin_clip = value.find('of') + 3
+            value = value[begin_clip:end_clip]
             return value
 
 
@@ -49,3 +48,5 @@ def scrapeNumberOfReviews(critic):
 # csvOpen('CriticScores.csv')
 
 scrapeNumberOfReviews('armond-white')
+scrapeNumberOfReviews('paul-eksteen')
+scrapeNumberOfReviews('james-adams')
