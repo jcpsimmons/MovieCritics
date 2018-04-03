@@ -48,15 +48,20 @@ def calculate_score(critic):
         page = urllib2.urlopen(test_page)
         #parse to BS4 format
         soup = BeautifulSoup(page, 'html.parser')
+        whole_page_corpus = soup
         # Reviews start at line 53 end with 249
         corpus = soup.select('td')
         # lop off array outside of 53 - 249
         ### THIS NEEDS to be tidied up and some how made relative so that different pages can be taken into account
 
         def find_review_number(corpus_input):
+            corpus_input = corpus_input.select('a')
+            print corpus_input
             for count, value in enumerate(corpus_input):
                 if str(value).find("Showing 1 - "):
                     return value
+
+        find_review_number(whole_page_corpus)
 
         # strip the code from the site topnav bar
         for i in range(0,50):
