@@ -27,12 +27,17 @@ def findFirst(search_string, corpus):
             value = value[begin_clip:end_clip]
             return value
 
-
 def csvOpen(filename):
     with open(filename, 'r') as csvfile:
         csvReader = csv.reader(csvfile)
         for row in csvReader:
             CRITIC_DICT[row[0]] = [row[1], -1]
+
+def csvWrite(filename):
+    with open (filename, 'wb') as csv_file:
+        writer = csv.writer(csv_file)
+        for key in CRITIC_DICT:
+            writer.writerow([key, CRITIC_DICT[key][0], CRITIC_DICT[key][1]])
 
 # BS4 loop to scrape number of reviews
 def scrapeNumberOfReviews(critic):
@@ -40,13 +45,15 @@ def scrapeNumberOfReviews(critic):
     page = urllib2.urlopen(test_page)
     soup = BeautifulSoup(page, 'html.parser')
     soup = soup.select('#criticsReviewsChart_main a')
-    print findFirst('Showing', soup)
-
+    return findFirst('Showing', soup)
 
 # save into CSV
 
-# csvOpen('CriticScores.csv')
+csvOpen('criticscores-excelmodified.csv')
 
-scrapeNumberOfReviews('armond-white')
-scrapeNumberOfReviews('paul-eksteen')
-scrapeNumberOfReviews('james-adams')
+for index, name in enumerate(CRITIC_DICT):
+    CRITIC_DICT[name][1] = scrapeNumberOfReviews(name)
+    print name
+    print CRITIC_DICT[name]
+
+csvWrite('reviewScoresandreviewNumbers.csv')
