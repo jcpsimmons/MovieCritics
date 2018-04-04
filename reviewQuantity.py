@@ -51,9 +51,13 @@ def scrapeNumberOfReviews(critic):
 
 csvOpen('criticscores-excelmodified.csv')
 
+count = 0
+
 for index, name in enumerate(CRITIC_DICT):
+    print str(len(CRITIC_DICT) - count) + " remaining!"
     CRITIC_DICT[name][1] = scrapeNumberOfReviews(name)
     print name
     print CRITIC_DICT[name]
+    count += 1
 
 csvWrite('reviewScoresandreviewNumbers.csv')
